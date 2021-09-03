@@ -31,9 +31,12 @@ class MyPyTrisWindow(arcade.Window):
 
         self.gameBoard.draw()
 
-    def on_key_press(self, key: int):
+    def on_key_press(self, key: int, modifiers: int):
         if key == arcade.key.UP or key == arcade.key.W:
-            self.playerPiece.move(0,1)
+            if modifiers & arcade.key.MOD_SHIFT == 1:
+                self.playerPiece.rotate()
+            else:
+                self.playerPiece.move(0,1)
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.playerPiece.move(0,-1)
         elif key == arcade.key.LEFT or key == arcade.key.A:

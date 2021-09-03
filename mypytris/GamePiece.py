@@ -30,38 +30,46 @@ class ShapeEnum(IntEnum):
 
 class GamePieceConfig():
 
-    def __init__(self, imgPath:str, shape:list[list[int]]) -> None:
+    def __init__(self, enum:ShapeEnum, imgPath:str, shape:list[list[int]]) -> None:
         self.shape = shape
         self.imgPath = imgPath
 
-GamePieceConfig.SQUARE  = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_006.png', 
+GamePieceConfig.SQUARE  = GamePieceConfig(ShapeEnum.SQUARE,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_006.png', 
                                           np.array([[1,1],
                                                     [1,1]], dtype=np.byte))
-GamePieceConfig.T       = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_003.png', 
+GamePieceConfig.T       = GamePieceConfig(ShapeEnum.T,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_003.png', 
                                           np.array([[0,0,0],
                                                     [0,1,0],
                                                     [1,1,1]], dtype=np.byte))
-GamePieceConfig.PLUS    = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_004.png', 
+GamePieceConfig.PLUS    = GamePieceConfig(ShapeEnum.PLUS,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_004.png', 
                                           np.array([[0,1,0],
                                                     [1,1,1],
                                                     [0,1,0]], dtype=np.byte))
-GamePieceConfig.L       = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_005.png', 
+GamePieceConfig.L       = GamePieceConfig(ShapeEnum.L,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_005.png', 
                                           np.array([[0,1,0],
                                                     [0,1,0],
                                                     [0,1,1]], dtype=np.byte))
-GamePieceConfig.J       = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_005.png', 
+GamePieceConfig.J       = GamePieceConfig(ShapeEnum.J,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_005.png', 
                                           np.array([[0,1,0],
                                                     [0,1,0],
                                                     [1,1,0]], dtype=np.byte))
-GamePieceConfig.S       = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_002.png', 
+GamePieceConfig.S       = GamePieceConfig(ShapeEnum.S,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_002.png', 
                                           np.array([[0,0,0],
                                                     [0,1,1],
                                                     [1,1,0]], dtype=np.byte))
-GamePieceConfig.TWO     = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_002.png', 
+GamePieceConfig.TWO     = GamePieceConfig(ShapeEnum.TWO,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_002.png', 
                                           np.array([[0,0,0],
                                                     [1,1,0],
                                                     [0,1,1]], dtype=np.byte))
-GamePieceConfig.I       = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_007.png', 
+GamePieceConfig.I       = GamePieceConfig(ShapeEnum.I,
+                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_007.png', 
                                           np.array([[0,1,0,0],
                                                     [0,1,0,0],
                                                     [0,1,0,0],
@@ -84,8 +92,9 @@ class GamePiece:
 
     def __init__(self, config:GamePieceConfig):
         self.config = config
-        self.size = len(self.config.shape)
-        self.blocks = [[] for y in range(self.size)]
+        self.size = len(self.config.shape[0])
+        self.blocks = []
+        self.rotation = 0
         for y in range(self.size):
             self.blocks.append([])
             for x in range(self.size):
@@ -105,6 +114,17 @@ class GamePiece:
             block.moveTo(x + xDiff, y + yDiff)
         self.x = x
         self.y = y
+
+    def rotate(self):
+        self.blocks = np.rot90(self.blocks)
+        for y in range(self.size):
+            for x in range(self.size):
+                block = self.blocks[y][x]
+                if block is None:
+                    continue
+                block.moveTo(self.x + x, self.y + y)
+        print(self.blocks)
+        
 
     def move(self, changeInX:int, changeInY:int):
         self.moveTo(self.x + changeInX, self.y + changeInY)
