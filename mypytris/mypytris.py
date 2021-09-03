@@ -18,8 +18,8 @@ class MyPyTrisWindow(arcade.Window):
         """Set up the game here. Call this function to restart the game."""
         self.gameBoard = Game.GameBoard(10, 20)
 
-        gamePiece = GamePiece.nextPiece()
-        self.gameBoard.addGamePiece(gamePiece)
+        self.playerPiece = GamePiece.nextPiece()
+        self.gameBoard.addGamePiece(self.playerPiece)
         
 
 
@@ -30,6 +30,16 @@ class MyPyTrisWindow(arcade.Window):
         # Code to draw the screen goes here
 
         self.gameBoard.draw()
+
+    def on_key_press(self, key: int):
+        if key == arcade.key.UP or key == arcade.key.W:
+            self.playerPiece.move(0,1)
+        elif key == arcade.key.DOWN or key == arcade.key.S:
+            self.playerPiece.move(0,-1)
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.playerPiece.move(-1,0)
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.playerPiece.move(1,0)
 
 
 def main():

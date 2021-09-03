@@ -34,9 +34,6 @@ class GamePieceConfig():
         self.shape = shape
         self.imgPath = imgPath
 
-    def get(shape:ShapeEnum):
-        return GamePieceConfig.DICT[shape]
-
 GamePieceConfig.SQUARE  = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_006.png', 
                                           np.array([[1,1],
                                                     [1,1]], dtype=np.byte))
@@ -101,11 +98,16 @@ class GamePiece:
 
     def moveTo(self, x: int, y: int):
         for block in self.allBlocks():
+            if block is None:
+                continue
             xDiff = block.x - self.x
             yDiff = block.y - self.y
             block.moveTo(x + xDiff, y + yDiff)
         self.x = x
         self.y = y
+
+    def move(self, changeInX:int, changeInY:int):
+        self.moveTo(self.x + changeInX, self.y + changeInY)
 
     def allBlocks(self) -> list[Block]:
         return [block for row in self.blocks for block in row] # python list comprehension is weird
