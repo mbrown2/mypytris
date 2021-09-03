@@ -5,6 +5,7 @@ Its cool because I made it.
 
 from enum import Enum
 import arcade
+import numpy
 from arcade.sprite_list.sprite_list import SpriteList
 
 
@@ -32,10 +33,16 @@ class Block:
 
 class GamePieceConfig:
 
-    def __init__(self) -> None:
-        self.shape = [[1,1],
-                      [1,1]]
-        self.imgPath = r'mypytris/sprites/Blocks_01_64x64_Alt_00_001.png'
+    def __init__(self, imgPath:str, shape:list[list[int]]) -> None:
+        self.shape = shape
+        self.imgPath = imgPath
+GamePieceConfig.SQUARE = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_004.png', 
+                                         [[1,1],
+                                          [1,1]])
+GamePieceConfig.T = GamePieceConfig(r'mypytris/sprites/Blocks_01_64x64_Alt_00_003.png', 
+                                    [[0,0,0],
+                                     [0,1,0],
+                                     [1,1,1]])
 
 class GamePiece:
     """ Game pieces are composed of multiple blocks that form a game piece shape """
@@ -43,7 +50,13 @@ class GamePiece:
     def __init__(self, config:GamePieceConfig):
         self.config = config
         self.size = len(self.config.shape)
-        self.blocks = [[Block(x,y, self.config.imgPath) for y in range(self.size)] for x in range(self.size)]
+        self.blocks = [[] for y in range(self.size)]
+        for y in range(self.size):
+            self.blocks.append([])
+            for x in range(self.size):
+                self.blocks[y].append(Block(x, y, config.imgPath) if self.config.shape[y][x] == 1 else None)
+
+        #self.blocks = [[Block(x,y, self.config.imgPath) for y in reversed(range(self.size)) if self.config.shape[x][y] == 1] for x in range(self.size)]
         self.x = 0
         self.y = 0
 
@@ -89,6 +102,8 @@ class GameBoard:
 
     def addGamePiece(self, gamePiece:GamePiece):
         for block in gamePiece.allBlocks():
+            if block is None:
+                continue
             self.blocks[block.x][block.y] = block
             self.playerSprites.append(block.sprite)
 
@@ -114,10 +129,11 @@ class MyPyTrisWindow(arcade.Window):
         """Set up the game here. Call this function to restart the game."""
         self.gameBoard = GameBoard(10, 20)
 
-        squareConfig = GamePieceConfig()
-        square = GamePiece(squareConfig)
+        square = GamePiece(GamePieceConfig.SQUARE)
         square.moveTo(8, 0)
+        t = GamePiece(GamePieceConfig.T)
         self.gameBoard.addGamePiece(square)
+        self.gameBoard.addGamePiece(t)
 
 
     def on_draw(self):
