@@ -47,6 +47,39 @@ class GameBoard:
                 return False
         return True
 
+    def addBlock(self, aBlock: gp.Block):
+        """adds a block to the game board"""
+
+        if self.blocks[aBlock.y][aBlock.x] != None:
+            raise MovementError('game board space not empty')
+        self.blocks[aBlock.y][aBlock.x] = aBlock
+        self.groundSprites.append(aBlock.sprite)
+
+
+    def moveBlock(self, aBlock: gp.Block, x: int, y: int):
+        self.blocks[aBlock.y][aBlock.x] = None
+        self.blocks[y][x] = aBlock
+
+    def removeBlock(self, aBlock: gp.Block):
+        """ remove a block from the game board """
+        
+        for y, row in enumerate(self.blocks):
+            for x, block in enumerate(row):
+                if block is aBlock:
+                    self.blocks[y][x] = None
+                    self.playerSprites.remove(aBlock.sprite)
+                    return
+
+    def addPlayerPiece(self, gamePiece:gp.GamePiece):
+        """Add game piece for player control"""
+        for row in gamePiece.blocks:
+            for block in row:
+                if block is None:
+                    continue
+                self.blocks[block.y][block.x] = block
+                self.playerSprites.append(block.sprite)
+        self.playerPiece = gamePiece
+
     def rotateGamePiece(self, gamePiece:gp.GamePiece):
         # check if we can rotate 90 degrees
         if not self.canMoveGamePiece(np.rot90(gamePiece.getMask()), gamePiece, gamePiece.x, gamePiece.y):
@@ -60,7 +93,7 @@ class GameBoard:
                     continue
                 block.moveTo(gamePiece.x + x, gamePiece.y + y)
         gamePiece.rotation = gamePiece.rotation + 1 % 3
-        
+
     def moveGamePiece(self, gamePiece:gp.GamePiece, xTo:int, yTo:int):
         if (not self.canMoveGamePiece(gamePiece.getMask(), gamePiece, xTo, yTo)):
             return False
@@ -82,41 +115,11 @@ class GameBoard:
                     self.blocks[newBlockY][newBlockX] = block
                     block.moveTo(newBlockX, newBlockY)
 
+        # update piece position
         gamePiece.x = xTo
         gamePiece.y = yTo
-        
 
-    def addBlock(self, aBlock: gp.Block):
-        """adds a block to the game board"""
 
-        if self.blocks[aBlock.y][aBlock.x] != None:
-            raise MovementError('game board space not empty')
-        self.blocks[aBlock.y][aBlock.x] = aBlock
-        self.groundSprites.append(aBlock.sprite)
-
-    def addPlayerPiece(self, gamePiece:gp.GamePiece):
-        for y in range(gamePiece.size):
-            for x in range(gamePiece.size):
-                block = gamePiece.blocks[y][x]
-                if block is None:
-                    continue
-                self.blocks[block.y][block.x] = block
-                self.playerSprites.append(block.sprite)
-        self.playerPiece = gamePiece
-
-    def moveBlock(self, aBlock: gp.Block, x: int, y: int):
-        self.blocks[aBlock.y][aBlock.x] = None
-        self.blocks[y][x] = aBlock
-
-    def removeBlock(self, aBlock: gp.Block):
-        """ remove a block from the game board """
-        
-        for y, row in enumerate(self.blocks):
-            for x, block in enumerate(row):
-                if block is aBlock:
-                    self.blocks[y][x] = None
-                    self.playerSprites.remove(aBlock.sprite)
-                    return
 
 class GameEngine:
     """Class to manage falling pieces and line detection"""
@@ -132,4 +135,5 @@ class GameEngine:
             self.doPlayerGravity()
 
     def doPlayerGravity(self):
-        self.board.playerPiece
+        playerPiece = self.board.playerPiece
+        if not self.board.canMoveGamePiece(playerPiece.getMask(), playerPiece, playerPiece.x, playerPiece.y-1):
