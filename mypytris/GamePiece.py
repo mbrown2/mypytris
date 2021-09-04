@@ -105,16 +105,6 @@ class GamePiece:
         self.x = 0
         self.y = 0
 
-    def moveTo(self, x: int, y: int):
-        for block in self.allBlocks():
-            if block is None:
-                continue
-            xDiff = block.x - self.x
-            yDiff = block.y - self.y
-            block.moveTo(x + xDiff, y + yDiff)
-        self.x = x
-        self.y = y
-
     def rotate(self):
         self.blocks = np.rot90(self.blocks)
         for y in range(self.size):

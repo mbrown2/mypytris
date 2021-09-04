@@ -16,6 +16,8 @@ class GameBoard:
 
     def __init__(self, width: int, height: int):
         # 2D list of blocks initialized to empty in the width and height of our game board
+        self.width = width
+        self.height = height
         self.blocks = [[None for y in range(width)] for x in range(height)]
         self.playerSprites = SpriteList()
         self.groundSprites = SpriteList()
@@ -28,33 +30,78 @@ class GameBoard:
     def canMoveBlock(self, x: int, y: int) -> bool:
         return self.blocks[x][y] is None
 
-    def canMoveGamePiece(self, gamePiece:gp.GamePiece, x:int, y:int) -> bool:
-        pass
+    def canMoveGamePiece(self, gamePiece:gp.GamePiece, xTo:int, yTo:int) -> bool:
+        for yDiff, row in enumerate(gamePiece.blocks):
+            for xDiff, block in enumerate(row):
+                if block is None:
+                    continue
+                newX = xTo + xDiff
+                newY = yTo + yDiff
+                if newX >= self.width or newX < 0:
+                    return False
+                if newY < 0 or newY >= self.height:
+                    return False
+                if self.blocks[newY][newX] is not None \
+                    and self.blocks[newY][newX] not in gamePiece.allBlocks():
+                    return False
+        return True
 
-    def addBlock(self, block: gp.Block):
-        """adds block to the game board"""
+    def moveGamePiece(self, gamePiece:gp.GamePiece, xTo:int, yTo:int):
+        if (not self.canMoveGamePiece(gamePiece, xTo, yTo)):
+            return False
 
-        if self.blocks[block.x][block.y] != None:
+        # remove blocks from game board
+        for y, row in enumerate(gamePiece.blocks):
+            for x, block in enumerate(row):
+                if block is not None:
+                    self.blocks[y + gamePiece.y][x + gamePiece.x] = None
+
+        # add blocks in new positions
+        for y, row in enumerate(gamePiece.blocks):
+            for x, block in enumerate(row):
+                if block is not None:
+                    blockXDiff = block.x - gamePiece.x
+                    blockYDiff = block.y - gamePiece.y
+                    newBlockX = xTo + blockXDiff
+                    newBlockY = yTo + blockYDiff
+                    self.blocks[newBlockY][newBlockX] = block
+                    block.moveTo(newBlockX, newBlockY)
+
+        gamePiece.x = xTo
+        gamePiece.y = yTo
+        
+
+    def addBlock(self, aBlock: gp.Block):
+        """adds a block to the game board"""
+
+        if self.blocks[aBlock.y][aBlock.x] != None:
             raise MovementError('game board space not empty')
-        self.blocks[block.x][block.y] = block
-        self.groundSprites.append(block.sprite)
+        self.blocks[aBlock.y][aBlock.x] = aBlock
+        self.groundSprites.append(aBlock.sprite)
 
     def addGamePiece(self, gamePiece:gp.GamePiece):
-        for block in gamePiece.allBlocks():
-            if block is None:
-                continue
-            self.blocks[block.x][block.y] = block
-            self.playerSprites.append(block.sprite)
+        for y in range(gamePiece.size):
+            for x in range(gamePiece.size):
+                block = gamePiece.blocks[y][x]
+                if block is None:
+                    continue
+                self.blocks[block.y][block.x] = block
+                self.playerSprites.append(block.sprite)
 
-    def moveBlock(self, block: gp.Block, x: int, y: int):
-        self.removeBlock(block)
-        self.blocks[x][y] = block
+    def moveBlock(self, aBlock: gp.Block, x: int, y: int):
+        self.blocks[aBlock.y][aBlock.x] = None
+        self.blocks[y][x] = aBlock
 
-    def removeBlock(self, block: gp.Block):
+    def removeBlock(self, aBlock: gp.Block):
         """ remove a block from the game board """
-        if (self.blocks[block.x][block.y] is not block):
-            raise MovementError('block not found on game board')
-        self.blocks[block.x][block.y] = None
+        
+        for y, row in iter(self.blocks):
+            for x, block in iter(row):
+                if block is aBlock:
+                    self.blocks[y][x] = None
+                    self.playerSprites.remove(aBlock.sprite)
+                    return
+
 
 class GameManager:
 

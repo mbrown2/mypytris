@@ -36,13 +36,13 @@ class MyPyTrisWindow(arcade.Window):
             if modifiers & arcade.key.MOD_SHIFT == 1:
                 self.playerPiece.rotate()
             else:
-                self.playerPiece.move(0,1)
+                self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x, self.playerPiece.y + 1)
         elif key == arcade.key.DOWN or key == arcade.key.S:
-            self.playerPiece.move(0,-1)
+            self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x, self.playerPiece.y - 1)
         elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.playerPiece.move(-1,0)
+            self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x - 1, self.playerPiece.y)
         elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.playerPiece.move(1,0)
+            self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x + 1, self.playerPiece.y)
 
 
 def main():
