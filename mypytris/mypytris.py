@@ -17,12 +17,14 @@ class MyPyTrisWindow(arcade.Window):
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
         self.gameBoard = Game.GameBoard(10, 20)
+        self.gameEngine = Game.GameEngine(self.gameBoard)
 
         self.playerPiece = GamePiece.nextPiece()
-        self.gameBoard.addGamePiece(self.playerPiece)
+        self.gameBoard.addPlayerPiece(self.playerPiece)
+
+    def on_update(self, delta_time: float):
+        self.gameEngine.on_update(delta_time)
         
-
-
     def on_draw(self):
         """Render the screen."""
 
@@ -34,7 +36,7 @@ class MyPyTrisWindow(arcade.Window):
     def on_key_press(self, key: int, modifiers: int):
         if key == arcade.key.UP or key == arcade.key.W:
             if modifiers & arcade.key.MOD_SHIFT == 1:
-                self.playerPiece.rotate()
+                self.gameBoard.rotateGamePiece(self.playerPiece)
             else:
                 self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x, self.playerPiece.y + 1)
         elif key == arcade.key.DOWN or key == arcade.key.S:

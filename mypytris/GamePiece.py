@@ -30,50 +30,51 @@ class ShapeEnum(IntEnum):
 
 class GamePieceConfig():
 
-    def __init__(self, enum:ShapeEnum, imgPath:str, shape:list[list[int]]) -> None:
+    def __init__(self, enum:ShapeEnum, imgPath:str, shape:np.ndarray) -> None:
+        self.shapeEnum = enum
         self.shape = shape
         self.imgPath = imgPath
 
 GamePieceConfig.SQUARE  = GamePieceConfig(ShapeEnum.SQUARE,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_006.png', 
                                           np.array([[1,1],
-                                                    [1,1]], dtype=np.byte))
+                                                    [1,1]], dtype=np.int8))
 GamePieceConfig.T       = GamePieceConfig(ShapeEnum.T,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_003.png', 
                                           np.array([[0,0,0],
                                                     [0,1,0],
-                                                    [1,1,1]], dtype=np.byte))
+                                                    [1,1,1]], dtype=np.int8))
 GamePieceConfig.PLUS    = GamePieceConfig(ShapeEnum.PLUS,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_004.png', 
                                           np.array([[0,1,0],
                                                     [1,1,1],
-                                                    [0,1,0]], dtype=np.byte))
+                                                    [0,1,0]], dtype=np.int8))
 GamePieceConfig.L       = GamePieceConfig(ShapeEnum.L,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_005.png', 
                                           np.array([[0,1,0],
                                                     [0,1,0],
-                                                    [0,1,1]], dtype=np.byte))
+                                                    [0,1,1]], dtype=np.int8))
 GamePieceConfig.J       = GamePieceConfig(ShapeEnum.J,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_005.png', 
                                           np.array([[0,1,0],
                                                     [0,1,0],
-                                                    [1,1,0]], dtype=np.byte))
+                                                    [1,1,0]], dtype=np.int8))
 GamePieceConfig.S       = GamePieceConfig(ShapeEnum.S,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_002.png', 
                                           np.array([[0,0,0],
                                                     [0,1,1],
-                                                    [1,1,0]], dtype=np.byte))
+                                                    [1,1,0]], dtype=np.int8))
 GamePieceConfig.TWO     = GamePieceConfig(ShapeEnum.TWO,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_002.png', 
                                           np.array([[0,0,0],
                                                     [1,1,0],
-                                                    [0,1,1]], dtype=np.byte))
+                                                    [0,1,1]], dtype=np.int8))
 GamePieceConfig.I       = GamePieceConfig(ShapeEnum.I,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_007.png', 
                                           np.array([[0,1,0,0],
                                                     [0,1,0,0],
                                                     [0,1,0,0],
-                                                    [0,1,0,0]], dtype=np.byte))
+                                                    [0,1,0,0]], dtype=np.int8))
 GamePieceConfig.ALL = [GamePieceConfig.SQUARE, GamePieceConfig.T, GamePieceConfig.PLUS,
                        GamePieceConfig.L, GamePieceConfig.J, GamePieceConfig.S, GamePieceConfig.TWO,
                        GamePieceConfig.I]
@@ -101,23 +102,11 @@ class GamePiece:
                 shapeFlipped = np.flipud(self.config.shape)
                 self.blocks[y].append(Block(x, y, config.imgPath) if shapeFlipped[y][x] == 1 else None)
 
-        #self.blocks = [[Block(x,y, self.config.imgPath) for y in reversed(range(self.size)) if self.config.shape[x][y] == 1] for x in range(self.size)]
         self.x = 0
         self.y = 0
 
-    def rotate(self):
-        self.blocks = np.rot90(self.blocks)
-        for y in range(self.size):
-            for x in range(self.size):
-                block = self.blocks[y][x]
-                if block is None:
-                    continue
-                block.moveTo(self.x + x, self.y + y)
-        print(self.blocks)
-        
-
-    def move(self, changeInX:int, changeInY:int):
-        self.moveTo(self.x + changeInX, self.y + changeInY)
+    def getMask(self):
+        return np.rot90(np.flipud(self.config.shape), self.rotation)
 
     def allBlocks(self) -> list[Block]:
         return [block for row in self.blocks for block in row] # python list comprehension is weird
