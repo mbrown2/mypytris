@@ -1,4 +1,3 @@
-
 from arcade.sprite_list.sprite_list import SpriteList
 import GamePiece as gp
 import numpy as np
@@ -70,15 +69,28 @@ class GameBoard:
                     self.playerSprites.remove(aBlock.sprite)
                     return
 
-    def addPlayerPiece(self, gamePiece:gp.GamePiece):
-        """Add game piece for player control"""
-        for row in gamePiece.blocks:
-            for block in row:
+    def spawnPlayerPiece(self):
+        """Spawn a new player piece"""
+
+        playerPiece = gp.nextPiece()
+        self.playerPiece = playerPiece
+
+        # set game piece starting position
+        playerPiece.y = self.height - 1 - playerPiece.size
+        playerPiece.x = int(self.width / 2 - playerPiece.size) - 1
+        
+        # initialize blocks
+        for y, row in enumerate(playerPiece.blocks):
+            for x, block in enumerate(row):
+                # skip empty blocks
                 if block is None:
                     continue
+                # move block to starting position
+                block.moveTo(playerPiece.x + block.x, playerPiece.y + block.y)
                 self.blocks[block.y][block.x] = block
                 self.playerSprites.append(block.sprite)
-        self.playerPiece = gamePiece
+        
+
 
     def rotateGamePiece(self, gamePiece:gp.GamePiece):
         # check if we can rotate 90 degrees
@@ -119,6 +131,13 @@ class GameBoard:
         gamePiece.x = xTo
         gamePiece.y = yTo
 
+    def killGamePiece(self, gamePiece:gp.GamePiece):
+        for block in gamePiece.allBlocks():
+            if block is None:
+                continue
+            self.playerSprites.remove(block.sprite)
+            self.groundSprites.append(block.sprite)
+        self.playerPiece = None
 
 
 class GameEngine:
@@ -130,10 +149,15 @@ class GameEngine:
         self.deltaSinceLastMove = 0.
 
     def on_update(self, deltaTime:float):
-        self.deltaSinceLastMove + deltaTime
+        self.deltaSinceLastMove += deltaTime
         if self.deltaSinceLastMove > self.speed:
             self.doPlayerGravity()
+            self.deltaSinceLastMove = 0
 
     def doPlayerGravity(self):
         playerPiece = self.board.playerPiece
         if not self.board.canMoveGamePiece(playerPiece.getMask(), playerPiece, playerPiece.x, playerPiece.y-1):
+            self.board.killGamePiece(playerPiece)
+            self.board.spawnPlayerPiece()
+        else:
+            self.board.moveGamePiece(playerPiece, playerPiece.x, playerPiece.y-1)

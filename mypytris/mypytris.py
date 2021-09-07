@@ -19,8 +19,7 @@ class MyPyTrisWindow(arcade.Window):
         self.gameBoard = Game.GameBoard(10, 20)
         self.gameEngine = Game.GameEngine(self.gameBoard)
 
-        self.playerPiece = GamePiece.nextPiece()
-        self.gameBoard.addPlayerPiece(self.playerPiece)
+        self.gameBoard.spawnPlayerPiece()
 
     def on_update(self, delta_time: float):
         self.gameEngine.on_update(delta_time)
@@ -34,17 +33,18 @@ class MyPyTrisWindow(arcade.Window):
         self.gameBoard.draw()
 
     def on_key_press(self, key: int, modifiers: int):
+        board = self.gameBoard
         if key == arcade.key.UP or key == arcade.key.W:
             if modifiers & arcade.key.MOD_SHIFT == 1:
-                self.gameBoard.rotateGamePiece(self.playerPiece)
+                board.rotateGamePiece(board.playerPiece)
             else:
-                self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x, self.playerPiece.y + 1)
+                board.moveGamePiece(board.playerPiece, board.playerPiece.x, board.playerPiece.y + 1)
         elif key == arcade.key.DOWN or key == arcade.key.S:
-            self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x, self.playerPiece.y - 1)
+            board.moveGamePiece(board.playerPiece, board.playerPiece.x, board.playerPiece.y - 1)
         elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x - 1, self.playerPiece.y)
+            board.moveGamePiece(board.playerPiece, board.playerPiece.x - 1, board.playerPiece.y)
         elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.gameBoard.moveGamePiece(self.playerPiece, self.playerPiece.x + 1, self.playerPiece.y)
+            board.moveGamePiece(board.playerPiece, board.playerPiece.x + 1, board.playerPiece.y)
 
 
 def main():
