@@ -32,17 +32,29 @@ class GameBoard:
         return self.blocks[x][y] is None
 
     def canMoveGamePiece(self, pieceMask:np.ndarray, gamePiece:gp.GamePiece, xTo:int, yTo:int) -> bool:
+        def locDump():
+            print(f"gamePiece: ({gamePiece.x},{gamePiece.y})")
+            print(f"to: ({xTo},{yTo})")
+            
         for point, value in np.ndenumerate(pieceMask):
             if value == 0:
                 continue
             newX = xTo + point[1]
             newY = yTo + point[0]
+            
             if newX >= self.width or newX < 0:
+                locDump()
+                print(f"width: {self.width}")
+                print("newX >= self.width or newX < 0")
                 return False
             if newY < 0 or newY >= self.height:
+                locDump()
+                print(f"height: {self.height}")
+                print("newY < 0 or newY >= self.height")
                 return False
             if self.blocks[newY][newX] is not None \
                 and self.blocks[newY][newX] not in gamePiece.allBlocks():
+                locDump()
                 return False
         return True
 
@@ -76,7 +88,7 @@ class GameBoard:
         self.playerPiece = playerPiece
 
         # set game piece starting position
-        playerPiece.y = self.height - 1 - playerPiece.size
+        playerPiece.y = self.height - playerPiece.size
         playerPiece.x = int(self.width / 2 - playerPiece.size) - 1
         
         # initialize blocks
@@ -97,13 +109,25 @@ class GameBoard:
         if not self.canMoveGamePiece(np.rot90(gamePiece.getMask()), gamePiece, gamePiece.x, gamePiece.y):
             return # nope, bail out
 
-        # rotate 90 degrees
-        gamePiece.blocks = np.rot90(gamePiece.blocks)
+        # remove blocks from game board
         for y, row in enumerate(gamePiece.blocks):
             for x, block in enumerate(row):
-                if block is None:
-                    continue
-                block.moveTo(gamePiece.x + x, gamePiece.y + y)
+                if block is not None:
+                    self.blocks[y + gamePiece.y][x + gamePiece.x] = None
+
+        # rotate 90 degrees
+        gamePiece.blocks = np.rot90(gamePiece.blocks)
+
+        # add blocks in new positions
+        for y, row in enumerate(gamePiece.blocks):
+            for x, block in enumerate(row):
+                if block is not None:
+                    block.x = gamePiece.x + x
+                    block.y = gamePiece.y + y
+                    self.blocks[block.y][block.x] = block
+                    block.moveTo(block.x, block.y)
+
+        # store rotation state
         gamePiece.rotation = gamePiece.rotation + 1 % 3
 
     def moveGamePiece(self, gamePiece:gp.GamePiece, xTo:int, yTo:int):

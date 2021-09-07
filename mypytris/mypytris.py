@@ -36,9 +36,9 @@ class MyPyTrisWindow(arcade.Window):
         board = self.gameBoard
         if key == arcade.key.UP or key == arcade.key.W:
             if modifiers & arcade.key.MOD_SHIFT == 1:
-                board.rotateGamePiece(board.playerPiece)
-            else:
                 board.moveGamePiece(board.playerPiece, board.playerPiece.x, board.playerPiece.y + 1)
+            else:
+                board.rotateGamePiece(board.playerPiece)
         elif key == arcade.key.DOWN or key == arcade.key.S:
             board.moveGamePiece(board.playerPiece, board.playerPiece.x, board.playerPiece.y - 1)
         elif key == arcade.key.LEFT or key == arcade.key.A:
