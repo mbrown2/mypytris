@@ -32,10 +32,6 @@ class GameBoard:
         return self.blocks[x][y] is None
 
     def canMoveGamePiece(self, pieceMask:np.ndarray, gamePiece:gp.GamePiece, xTo:int, yTo:int) -> bool:
-        def locDump():
-            print(f"gamePiece: ({gamePiece.x},{gamePiece.y})")
-            print(f"to: ({xTo},{yTo})")
-            
         for point, value in np.ndenumerate(pieceMask):
             if value == 0:
                 continue
@@ -43,18 +39,11 @@ class GameBoard:
             newY = yTo + point[0]
             
             if newX >= self.width or newX < 0:
-                locDump()
-                print(f"width: {self.width}")
-                print("newX >= self.width or newX < 0")
                 return False
             if newY < 0 or newY >= self.height:
-                locDump()
-                print(f"height: {self.height}")
-                print("newY < 0 or newY >= self.height")
                 return False
             if self.blocks[newY][newX] is not None \
                 and self.blocks[newY][newX] not in gamePiece.allBlocks():
-                locDump()
                 return False
         return True
 

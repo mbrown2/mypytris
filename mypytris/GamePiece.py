@@ -44,11 +44,6 @@ GamePieceConfig.T       = GamePieceConfig(ShapeEnum.T,
                                           np.array([[0,0,0],
                                                     [0,1,0],
                                                     [1,1,1]], dtype=np.int8))
-GamePieceConfig.PLUS    = GamePieceConfig(ShapeEnum.PLUS,
-                                          r'mypytris/sprites/Blocks_01_64x64_Alt_00_004.png', 
-                                          np.array([[0,1,0],
-                                                    [1,1,1],
-                                                    [0,1,0]], dtype=np.int8))
 GamePieceConfig.L       = GamePieceConfig(ShapeEnum.L,
                                           r'mypytris/sprites/Blocks_01_64x64_Alt_00_005.png', 
                                           np.array([[0,1,0],
@@ -81,7 +76,6 @@ GamePieceConfig.ALL = [GamePieceConfig.SQUARE, GamePieceConfig.T, GamePieceConfi
 GamePieceConfig.DICT = {
     ShapeEnum.SQUARE: GamePieceConfig.SQUARE,
     ShapeEnum.T:      GamePieceConfig.T,
-    ShapeEnum.PLUS:   GamePieceConfig.PLUS,
     ShapeEnum.L:      GamePieceConfig.L,
     ShapeEnum.J:      GamePieceConfig.J,
     ShapeEnum.S:      GamePieceConfig.S,
